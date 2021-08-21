@@ -7,6 +7,10 @@ LOG = getLogger(__name__)
 
 
 class TwitterClient:
+    """
+    A basic client for Twitter
+    """
+
     def __init__(
         self,
         consumer_key: str,
