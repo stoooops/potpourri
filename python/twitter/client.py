@@ -1,3 +1,4 @@
+import json
 from logging import getLogger
 
 import tweepy
@@ -31,3 +32,15 @@ class TwitterClient:
         for status in tweepy.Cursor(self._api.user_timeline).items():
             self._api.destroy_status(status.id)
             LOG.info(f"Deleted tweet {status.id}")
+
+
+def make_twitter_client(secrets_json_filepath: str) -> TwitterClient:
+    with open(secrets_json_filepath, "r") as f:
+        content = json.loads(f.read())
+
+        return TwitterClient(
+            consumer_key=content["consumer_key"],
+            consumer_secret=content["consumer_secret"],
+            access_token=content["access_token"],
+            access_secret=content["access_secret"],
+        )
