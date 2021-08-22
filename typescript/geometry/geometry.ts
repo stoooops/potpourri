@@ -11,7 +11,7 @@ export function lineIntersectsPoint(l: Line, p: Point): boolean {
     const lowY = Math.min(l.y1, l.y2);
     const highY = Math.max(l.y1, l.y2);
 
-    if ((highX - lowX) < 1 && lowX < p.x && p.x < highX) {
+    if (highX - lowX < 1 && lowX < p.x && p.x < highX) {
         return true;
     }
     if (lowY == highY && lowY < p.y && p.y < highY) {
@@ -34,10 +34,10 @@ export function linesIntersect(l1: Line, l2: Line): boolean {
 function _intersects(a: number, b: number, c: number, d: number, p: number, q: number, r: number, s: number): boolean {
     const det = (c - a) * (s - q) - (r - p) * (d - b);
     if (det === 0) {
-      return false;
+        return false;
     } else {
-      const lambda = ((s - q) * (r - a) + (p - r) * (s - b)) / det;
-      const gamma = ((b - d) * (r - a) + (c - a) * (s - b)) / det;
-      return (0 < lambda && lambda < 1) && (0 < gamma && gamma < 1);
+        const lambda = ((s - q) * (r - a) + (p - r) * (s - b)) / det;
+        const gamma = ((b - d) * (r - a) + (c - a) * (s - b)) / det;
+        return 0 < lambda && lambda < 1 && 0 < gamma && gamma < 1;
     }
-  }
+}

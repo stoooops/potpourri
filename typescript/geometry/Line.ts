@@ -49,5 +49,4 @@ export class Line {
     reversed(): Line {
         return new Line(this.p2, this.p1);
     }
-
 }
