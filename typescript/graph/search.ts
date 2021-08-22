@@ -43,7 +43,7 @@ export function breadthFirstSearch(startVertex: Point, graph: Graph, sizeLimit: 
 
             const other: Point = edge.opposite(v);
             const isVisited = visited.get(other.toString());
-            console.log(`Visited ${other}: ${isVisited}`);
+            console.debug(`Visited ${other}: ${isVisited}`);
             if (!isVisited) {
                 visited.set(other.toString(), true);
                 if (vertices.length < sizeLimit) {
@@ -55,12 +55,12 @@ export function breadthFirstSearch(startVertex: Point, graph: Graph, sizeLimit: 
         }
     }
 
-    console.log(`BFS found <V> = ${vertices.length}, <E> = ${edges.length}`);
+    console.log(`BFS found (<V>=${vertices.length}, <E>=${edges.length})`);
     vertices.forEach((v) => {
-        console.log(v);
+        console.debug(v);
     });
     edges.forEach((e) => {
-        console.log(e);
+        console.debug(e);
     });
 
     return new GraphImpl(vertices, edges);

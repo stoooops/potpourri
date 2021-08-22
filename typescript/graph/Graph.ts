@@ -29,6 +29,7 @@ export interface Graph {
 
     // in progress
     getConnectedComponents(): Set<Graph>;
+    largestConnectedComponent(): Graph;
 }
 
 /**
@@ -132,6 +133,24 @@ export class GraphImpl implements Graph {
         });
 
         return result;
+    }
+
+    largestConnectedComponent(): Graph {
+        const connectedComponents: Graph[] = Array.from(this.getConnectedComponents());
+        if (connectedComponents.length === 0) {
+            throw Error("No connected components");
+        }
+        if (connectedComponents.length === 1) {
+            return connectedComponents[0];
+        }
+        let largest: Graph = connectedComponents[0];
+        for (let i = 1; i < connectedComponents.length; i++) {
+            const g: Graph = connectedComponents[i];
+            if (g.numVertices > largest.numVertices) {
+                largest = g;
+            }
+        }
+        return largest;
     }
 
     addVertex(vertex: Point): void {
