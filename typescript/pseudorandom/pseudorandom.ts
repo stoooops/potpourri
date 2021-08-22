@@ -22,7 +22,7 @@ export function seedrandFloat(input: _seedrandFloatInput): number {
     // get rng
     let rng = _seedrands.get(seed);
     if (rng === undefined) {
-        console.log(`Seed rng: ${seed}`);
+        console.debug(`Seed rng: ${seed}`);
         rng = seedrandom(seed);
         _seedrands.set(seed, rng);
         _seedrandVals.set(seed, []);

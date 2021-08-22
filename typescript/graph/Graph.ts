@@ -11,14 +11,17 @@ import { Point } from "../geometry/Point";
  */
 export interface Graph {
     vertices: Set<Point>;
+    verticesArray: Point[];
     edges: Set<Line>;
+    edgesArray: Line[];
     numVertices: number;
     numEdges: number;
     numConnectedComponents: number;
 
     addVertex(vertex: Point): void;
-    addEdge(edge: Line): void;
+    removeVertex(vertex: Point): void;
 
+    addEdge(edge: Line): void;
     getEdges(vertex: Point): Set<Line>;
     hasEdge(edge: Line): boolean;
     removeEdge(edges: Line);
@@ -80,12 +83,20 @@ export class GraphImpl implements Graph {
         return this._vertices;
     }
 
+    get verticesArray(): Point[] {
+        return Array.from(this.vertices);
+    }
+
     get numVertices(): number {
         return this._vertices.size;
     }
 
     get edges(): Set<Line> {
         return this._edges;
+    }
+
+    get edgesArray(): Line[] {
+        return Array.from(this.edges);
     }
 
     get numEdges(): number {
@@ -124,10 +135,10 @@ export class GraphImpl implements Graph {
         }
         //////////////////////////////////////////////////////////////////////////////////////////
 
-        console.log(`Found ${this.numConnectedComponents} connected components`);
+        console.debug(`Found ${this.numConnectedComponents} connected components`);
         verticesByConnectedComponent.forEach((vertices, root, map) => {
             const edges: Set<Line> = edgesByConnectedComponent.get(root) as Set<Line>;
-            console.log(`Found connected component with ${vertices.size} vertices and ${edges.size}`);
+            console.debug(`Found connected component with ${vertices.size} vertices and ${edges.size} edges`);
             const connectedComponent: Graph = new GraphImpl(vertices, edges);
             result.add(connectedComponent);
         });
@@ -166,6 +177,15 @@ export class GraphImpl implements Graph {
         // add vertex with no edges
         this._unions.set(vertex, makeSet());
         this._numConnectedComponents++;
+    }
+
+    removeVertex(vertex: Point): void {
+        this.removeEdges(this.getEdges(vertex));
+        this._vertices.delete(vertex);
+        this._vertexToEdges.delete(vertex);
+        this._unions.delete(vertex);
+        // now it is dangling so need to record the -1 connected components
+        this._numConnectedComponents--;
     }
 
     addEdge(edge: Line): void {
