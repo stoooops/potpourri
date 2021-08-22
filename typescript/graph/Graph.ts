@@ -20,6 +20,7 @@ export interface Graph {
     addEdge(edge: Line): void;
 
     getEdges(vertex: Point): Set<Line>;
+    hasEdge(edge: Line): boolean;
     removeEdge(edges: Line);
     removeEdges(edges: Set<Line>);
 
@@ -58,7 +59,7 @@ export class GraphImpl implements Graph {
      */
     private _numConnectedComponents: number;
 
-    constructor(vertices: Set<Point>, edges: Set<Line>) {
+    constructor(vertices: Set<Point> | Point[], edges: Set<Line> | Line[]) {
         this._vertices = new Set<Point>();
         this._edges = new Set<Line>();
         this._unions = new WeakMap();
@@ -149,7 +150,7 @@ export class GraphImpl implements Graph {
     }
 
     addEdge(edge: Line): void {
-        if (this._edges.has(edge) || this._edges.has(edge.reversed())) {
+        if (this.hasEdge(edge)) {
             throw `Already contains edge: ${edge}`;
         }
         this._edges.add(edge);
@@ -169,6 +170,10 @@ export class GraphImpl implements Graph {
 
     getEdges(vertex: Point): Set<Line> {
         return this._vertexToEdges.get(vertex) as Set<Line>;
+    }
+
+    hasEdge(edge: Line): boolean {
+        return this.edges.has(edge) || this.edges.has(edge.reversed());
     }
 
     private rebuildUnionFind() {

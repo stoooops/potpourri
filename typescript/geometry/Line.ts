@@ -46,7 +46,15 @@ export class Line {
         return this.p2.y;
     }
 
+    opposite(p: Point): Point {
+        return this.p1 === p ? this.p2 : this.p1;
+    }
+
     reversed(): Line {
         return new Line(this.p2, this.p1);
+    }
+
+    toString(): string {
+        return `(${this._p1.toString()}, ${this._p2.toString()})`;
     }
 }
