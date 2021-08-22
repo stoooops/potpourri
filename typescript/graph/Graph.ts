@@ -3,6 +3,10 @@ import { Line } from "../geometry/Line";
 import { Point } from "../geometry/Point";
 
 /**
+ * This relies on the union-find library: https://www.npmjs.com/package/@manubb/union-find
+ */
+
+/**
  * A Graph interface, modeling Graph Theory primitives.
  */
 export interface Graph {
@@ -21,25 +25,44 @@ export interface Graph {
 
     isConnected(v1: Point, v2: Point): boolean;
     isDisjoint(v1: Point, v2: Point): boolean;
+
+    // in progress
+    getConnectedComponents(): Set<Graph>;
 }
 
 /**
  * A implementation of a Graph.
  */
 export class GraphImpl implements Graph {
+    /**
+     * Unique set of vertices, unsorted.
+     */
     private readonly _vertices: Set<Point>;
+    /**
+     * Unique set of edges, unsorted.
+     */
     private readonly _edges: Set<Line>;
 
+    /**
+     * Map from vertex to its set of edgdes.
+     */
     private readonly _vertexToEdges: WeakMap<Point, Set<Line>>;
 
+    /**
+     * Map from vertex to connected component root.
+     */
     private readonly _unions: WeakMap<Point, unknown>;
-    private _numComponents: number;
+
+    /**
+     * The number of connected components.
+     */
+    private _numConnectedComponents: number;
 
     constructor(vertices: Set<Point>, edges: Set<Line>) {
         this._vertices = new Set<Point>();
         this._edges = new Set<Line>();
         this._unions = new WeakMap();
-        this._numComponents = 0;
+        this._numConnectedComponents = 0;
 
         this._vertexToEdges = new WeakMap();
 
@@ -68,7 +91,46 @@ export class GraphImpl implements Graph {
     }
 
     get numConnectedComponents(): number {
-        return this._numComponents;
+        return this._numConnectedComponents;
+    }
+
+    getConnectedComponents(): Set<Graph> {
+        const result = new Set<Graph>();
+
+        //////////////////////////////////////////////////////////////////////////////////////////
+        // group vertices by connected component
+        const verticesByConnectedComponent: Map<unknown, Set<Point>> = new Map();
+        const edgesByConnectedComponent: Map<unknown, Set<Line>> = new Map();
+        this.vertices.forEach((v) => {
+            const rootUnion = this.treeRoot(v);
+            // console.log(rootUnion);
+            const existingVertices: Set<Point> = verticesByConnectedComponent.get(rootUnion) || new Set<Point>();
+            existingVertices.add(v);
+            verticesByConnectedComponent.set(rootUnion, existingVertices);
+
+            const existingEdges: Set<Line> = edgesByConnectedComponent.get(rootUnion) || new Set<Line>();
+            const vertexEdges: Set<Line> = this.getEdges(v);
+            vertexEdges.forEach((e) => {
+                existingEdges.add(e);
+            });
+            edgesByConnectedComponent.set(rootUnion, existingEdges);
+        });
+        if (this.numConnectedComponents !== verticesByConnectedComponent.size) {
+            throw Error(
+                `Invalid state. this.numConnectedComponents = ${this.numConnectedComponents}, but found ${verticesByConnectedComponent.size} from vertices roots`
+            );
+        }
+        //////////////////////////////////////////////////////////////////////////////////////////
+
+        console.log(`Found ${this.numConnectedComponents} connected components`);
+        verticesByConnectedComponent.forEach((vertices, root, map) => {
+            const edges: Set<Line> = edgesByConnectedComponent.get(root) as Set<Line>;
+            console.log(`Found connected component with ${vertices.size} vertices and ${edges.size}`);
+            const connectedComponent: Graph = new GraphImpl(vertices, edges);
+            result.add(connectedComponent);
+        });
+
+        return result;
     }
 
     addVertex(vertex: Point): void {
@@ -81,8 +143,9 @@ export class GraphImpl implements Graph {
     }
 
     private unionVertex(vertex: Point): void {
+        // add vertex with no edges
         this._unions.set(vertex, makeSet());
-        this._numComponents++;
+        this._numConnectedComponents++;
     }
 
     addEdge(edge: Line): void {
@@ -97,8 +160,10 @@ export class GraphImpl implements Graph {
 
     private unionEdge(edge: Line): void {
         if (!this.isConnected(edge.p1, edge.p2)) {
-            this._numComponents--;
+            // points were not previously connected, so this connects two subgraphs
+            this._numConnectedComponents--;
         }
+        // update the union pointer
         union(this._unions.get(edge.p1), this._unions.get(edge.p2));
     }
 
@@ -107,7 +172,7 @@ export class GraphImpl implements Graph {
     }
 
     private rebuildUnionFind() {
-        this._numComponents = 0;
+        this._numConnectedComponents = 0;
         this._vertices.forEach((v) => {
             this.unionVertex(v);
         });
@@ -130,22 +195,19 @@ export class GraphImpl implements Graph {
         this.rebuildUnionFind();
     }
 
+    treeRoot(v: Point): any {
+        if (v === undefined) {
+            throw `Bad input: ${v}`;
+        }
+        const obj: unknown = this._unions.get(v);
+        if (obj === undefined) {
+            throw `Missing: ${v}`;
+        }
+        return find(obj);
+    }
+
     isConnected(v1: Point, v2: Point): boolean {
-        if (v1 === undefined) {
-            throw `Bad input v1: ${v1}`;
-        }
-        if (v2 === undefined) {
-            throw `Bad input v2: ${v2}`;
-        }
-        const obj1: unknown = this._unions.get(v1);
-        if (obj1 === undefined) {
-            throw `Missing: ${v1}`;
-        }
-        const obj2: unknown = this._unions.get(v2);
-        if (obj2 === undefined) {
-            throw `Missing: ${v2}`;
-        }
-        return find(obj1) === find(obj2);
+        return this.treeRoot(v1) === this.treeRoot(v2);
     }
 
     isDisjoint(v1: Point, v2: Point): boolean {
