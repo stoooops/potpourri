@@ -46,3 +46,17 @@ interface _seedrandIntInput extends _seedrandFloatInput {
 export function seedrandInt(seedrandIntInput: _seedrandIntInput): number {
     return Math.floor(seedrandFloat(seedrandIntInput) * seedrandIntInput.max);
 }
+
+/**
+ * @returns a pseudorandom integer between 0 and 1
+ */
+export function randFloat(): number {
+    return Math.random();
+}
+
+/**
+ * @returns a pseudorandom integer between 0 and given max
+ */
+export function randInt(max: number): number {
+    return Math.floor(randFloat() * max);
+}
