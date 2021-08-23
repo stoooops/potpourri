@@ -36,13 +36,13 @@ interface RGB {
     b: number;
 }
 
-function componentToHex(c) {
+function componentToHex(c: number) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
 }
 
-function rgbToHex(r: number, g: number, b: number) {
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+function rgbToHex(rgb: RGB) {
+    return "#" + componentToHex(rgb.r) + componentToHex(rgb.g) + componentToHex(rgb.b);
 }
 function hexToRgb(hex: string): RGB {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -71,6 +71,49 @@ interface HSL {
      * Lightness percent [0-1]
      */
     l: number;
+}
+
+/**
+ * Converts an HSL color value to RGB. Conversion formula
+ * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
+ * Assumes h, s, and l are contained in the set [0, 1] and
+ * returns r, g, and b in the set [0, 255].
+ *
+ * @param   {number}  h       The hue
+ * @param   {number}  s       The saturation
+ * @param   {number}  l       The lightness
+ * @return  {Array}           The RGB representation
+ */
+function hslToRgb(hsl: HSL): RGB {
+    let h = hsl.h / 360;
+    let s = hsl.s;
+    let l = hsl.l;
+    let r, g, b;
+
+    if (s == 0) {
+        r = g = b = l; // achromatic
+    } else {
+        let hue2rgb = function hue2rgb(p, q, t) {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+        };
+
+        let q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        let p = 2 * l - q;
+        r = hue2rgb(p, q, h + 1 / 3);
+        g = hue2rgb(p, q, h);
+        b = hue2rgb(p, q, h - 1 / 3);
+    }
+
+    return {
+        r: Math.round(r * 255),
+        g: Math.round(g * 255),
+        b: Math.round(b * 255),
+    };
 }
 
 /**
@@ -116,6 +159,10 @@ function rgbToHsl(rgb: RGB): HSL {
     return { h: h * 360, s: s, l: l };
 }
 
+function hslToHex(hsl: HSL): string {
+    return rgbToHex(hslToRgb(hsl));
+}
+
 /**
  * A color.
  */
@@ -136,5 +183,43 @@ export class Color {
 
     shade(percent: number): Color {
         return new Color(rgbShadeColor(this.hex, percent));
+    }
+
+    rotate(degrees: number) {
+        return new Color(
+            rgbToHex(
+                hslToRgb({
+                    h: (this.hsl.h + degrees) % 360,
+                    s: this.hsl.s,
+                    l: this.hsl.l,
+                })
+            )
+        );
+    }
+
+    analagous(rotation: number, quantity: number): Color[] {
+        if (quantity < 3 || quantity % 2 === 0) {
+            throw Error(`Bad quantity: ${quantity}`);
+        }
+        const result: Color[] = [this];
+        let i = 0;
+        while (result.length < quantity) {
+            i++;
+            result.push(this.rotate(rotation * i));
+            result.push(this.rotate(-rotation * i));
+        }
+        return result;
+    }
+
+    complimentary(): Color[] {
+        return [this, this.rotate(180)];
+    }
+
+    triadic(): Color[] {
+        return [this, this.rotate(120), this.rotate(240)];
+    }
+
+    tetradic(): Color[] {
+        return [this, this.rotate(90), this.rotate(180), this.rotate(270)];
     }
 }
