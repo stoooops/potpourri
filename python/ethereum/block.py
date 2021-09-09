@@ -80,6 +80,10 @@ class BaseBlock:
         return datetime.fromtimestamp(self._timestamp)
 
     @property
+    def day_dt(self) -> datetime:
+        return self.timestamp_dt.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    @property
     def hour_dt(self) -> datetime:
         return self.timestamp_dt.replace(minute=0, second=0, microsecond=0)
 
