@@ -20,6 +20,7 @@ class BaseBlock:
     """
     An Ethereum block
     """
+
     def __init__(self, data: Dict[str, str]):
         self._data: Dict[str, Any] = data
 
@@ -95,6 +96,7 @@ class Block(BaseBlock):
     """
     A mined Ethereum block.
     """
+
     def __init__(self, data: Dict[str, str]):
         super().__init__(data)
         self._total_difficulty = data["totalDifficulty"]
@@ -104,6 +106,7 @@ class UncleBlock(BaseBlock):
     """
     An Ethereum uncle block.
     """
+
     def __init__(self, data: Dict[str, Any], mined_block_num: int, uncle_index: int):
         super().__init__(data)
 
