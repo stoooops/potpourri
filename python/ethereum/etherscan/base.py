@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Dict, Optional
 
 
@@ -35,6 +36,10 @@ class BaseEvent:
     @property
     def timestamp(self) -> int:
         return self._timestamp
+
+    @property
+    def timestamp_datetime(self) -> datetime:
+        return datetime.fromtimestamp(self._timestamp).astimezone(tz=timezone.utc)
 
     @property
     def hash(self) -> str:

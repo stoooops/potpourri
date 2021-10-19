@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Dict
 
 from potpourri.python.ethereum.etherscan.base import BaseEvent
@@ -30,3 +31,7 @@ class ERC20Transfer(BaseEvent):
     @property
     def value(self) -> int:
         return self._value
+
+    @property
+    def value_decimal(self) -> Decimal:
+        return self._value / 10 ** self._token_decimal
