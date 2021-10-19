@@ -1,15 +1,17 @@
 import json
 from decimal import Decimal
-from typing import Dict
+from typing import Any, Dict, List
 
 import requests
+
+from potpourri.python.ethereum.etherscan.transaction import Transaction
 
 
 class EtherscanClient:
     def __init__(self, api_key: str):
         self._base_url = f"https://api.etherscan.io/api?apikey={api_key}"
 
-    def query(self, url) -> Dict[str, str]:
+    def query(self, url) -> Dict[str, Any]:
         response = requests.get(url)
 
         if response.status_code != 200:
@@ -27,7 +29,9 @@ class EtherscanClient:
         balance: str = response["result"]
         return Decimal(balance)
 
-    def get_txlist(self, address: str, start_block: int = 0, end_block: int = 99999999, page: int = 1, offset: int = 0):
+    def get_txlist(
+        self, address: str, start_block: int = 0, end_block: int = 99999999, page: int = 1, offset: int = 0
+    ) -> List[Transaction]:
         query_args = "&".join(
             [
                 "module=account",
@@ -42,6 +46,6 @@ class EtherscanClient:
         )
         url = f"{self._base_url}&{query_args}"
 
-        response: Dict[str, str] = self.query(url)
-        result: str = response["result"]
+        response: Dict[str, Any] = self.query(url)
+        result: List[Transaction] = [Transaction(t) for t in response["result"]]
         return result
