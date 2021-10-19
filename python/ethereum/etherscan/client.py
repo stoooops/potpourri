@@ -1,15 +1,20 @@
 import json
 from decimal import Decimal
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import requests
 
+from potpourri.python.ethereum.etherscan.erc721 import ERC721Transfer
 from potpourri.python.ethereum.etherscan.transaction import Transaction
 
 
 class EtherscanClient:
     def __init__(self, api_key: str):
         self._base_url = f"https://api.etherscan.io/api?apikey={api_key}"
+
+    @staticmethod
+    def tx_url(hash_: str) -> str:
+        return f"https://etherscan.io/tx/{hash_}"
 
     def query(self, url) -> Dict[str, Any]:
         response = requests.get(url)
@@ -48,4 +53,34 @@ class EtherscanClient:
 
         response: Dict[str, Any] = self.query(url)
         result: List[Transaction] = [Transaction(t) for t in response["result"]]
+        return result
+
+    def get_tokennfttx(
+        self,
+        address: str,
+        contract_address: Optional[str] = "",
+        start_block: int = 0,
+        end_block: int = 99999999,
+        page: int = 1,
+        offset: int = 0,
+    ) -> List[ERC721Transfer]:
+        query_args_list = [
+            "module=account",
+            "action=tokennfttx",
+            f"contract_address={contract_address}",
+            f"address={address}",
+            f"startblock={start_block}",
+            f"endblock={end_block}",
+            f"page={page}",
+            f"offset={offset}",
+            "sort=asc",
+        ]
+        if contract_address:
+            query_args_list.append(contract_address)
+
+        query_args = "&".join(query_args_list)
+        url = f"{self._base_url}&{query_args}"
+
+        response: Dict[str, Any] = self.query(url)
+        result: List[ERC721Transfer] = [ERC721Transfer(t) for t in response["result"]]
         return result
