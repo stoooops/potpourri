@@ -26,7 +26,7 @@ class TwitterClient:
         try:
             self._api.verify_credentials()
             LOG.info("Authentication OK")
-        except:
+        except Exception:
             LOG.error("Error during authentication")
 
     def tweet(self, s: str) -> None:
