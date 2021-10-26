@@ -1,5 +1,6 @@
 import json
 from logging import getLogger
+from typing import Optional
 
 import tweepy
 
@@ -29,8 +30,11 @@ class TwitterClient:
         except Exception:
             LOG.error("Error during authentication")
 
-    def tweet(self, s: str) -> None:
-        self._api.update_status(s)
+    def tweet(self, s: str, media_filepath: Optional[str] = None) -> None:
+        if media_filepath is None:
+            self._api.update_status(s)
+        else:
+            self._api.update_with_media(media_filepath, s)
 
     def delete_all(self) -> None:
         for status in tweepy.Cursor(self._api.user_timeline).items():
