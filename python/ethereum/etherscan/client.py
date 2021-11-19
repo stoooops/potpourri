@@ -36,7 +36,12 @@ class EtherscanClient:
         return Decimal(balance)
 
     def get_txlist(
-        self, address: str, start_block: int = 0, end_block: int = 99999999, page: int = 1, offset: int = 0
+        self,
+        address: str,
+        start_block: int = 0,
+        end_block: int = 99999999,
+        page: int = 1,
+        offset: int = 0,
     ) -> List[Transaction]:
         query_args = "&".join(
             [
