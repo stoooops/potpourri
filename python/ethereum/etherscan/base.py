@@ -2,6 +2,11 @@ from datetime import datetime, timezone
 from typing import Dict, Optional
 
 
+class TransactionHash(str):
+    def __new__(cls, content):
+        return str.__new__(cls, content)
+
+
 class BaseEvent:
     def __init__(self, data: Dict[str, str]):
         self._data = data
@@ -18,7 +23,7 @@ class BaseEvent:
             self._gas: int = int(data["gas"])  # gas
             self._gas_price: int = int(data["gasPrice"])  # wei
             self._gas_used = int(data["gasUsed"])
-            self._hash: str = data["hash"]
+            self._hash: TransactionHash = TransactionHash(data["hash"])
             self._input: str = data["input"]
             self._nonce: int = int(data["nonce"])
             self._timestamp: int = int(data["timeStamp"])
@@ -42,7 +47,7 @@ class BaseEvent:
         return datetime.fromtimestamp(self._timestamp).astimezone(tz=timezone.utc)
 
     @property
-    def hash(self) -> str:
+    def hash(self) -> TransactionHash:
         return self._hash
 
     @property
