@@ -32,11 +32,11 @@ class Transaction(BaseEventDetailed):
 
     @property
     def fee_gwei(self) -> Decimal:
-        return self._gas_used * self._gas_price / 10 ** 9
+        return Decimal(self._gas_used * self._gas_price) / 10 ** 9
 
     @property
     def fee_eth(self) -> Decimal:
-        return self._gas_used * self._gas_price / 10 ** 18
+        return Decimal(self._gas_used * self._gas_price) / 10 ** 18
 
     @property
     def value_wei(self) -> int:
