@@ -1,10 +1,10 @@
 from decimal import Decimal
 from typing import Dict
 
-from potpourri.python.ethereum.etherscan.base import BaseEvent
+from potpourri.python.ethereum.etherscan.base import BaseEventDetailed
 
 
-class ERC20Transfer(BaseEvent):
+class ERC20Transfer(BaseEventDetailed):
     def __init__(self, data: Dict[str, str]):
         super().__init__(data=data)
 

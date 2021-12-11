@@ -6,7 +6,7 @@ import requests
 
 from potpourri.python.ethereum.etherscan.erc20 import ERC20Transfer
 from potpourri.python.ethereum.etherscan.erc721 import ERC721Transfer
-from potpourri.python.ethereum.etherscan.transaction import Transaction
+from potpourri.python.ethereum.etherscan.transaction import InternalTransaction, Transaction
 
 
 class EtherscanClient:
@@ -59,6 +59,32 @@ class EtherscanClient:
 
         response: Dict[str, Any] = self.query(url)
         result: List[Transaction] = [Transaction(t) for t in response["result"]]
+        return result
+
+    def get_txlistinternal(
+        self,
+        address: str,
+        start_block: int = 0,
+        end_block: int = 99999999,
+        page: int = 1,
+        offset: int = 0,
+    ) -> List[InternalTransaction]:
+        query_args = "&".join(
+            [
+                "module=account",
+                "action=txlistinternal",
+                f"address={address}",
+                f"startblock={start_block}",
+                f"endblock={end_block}",
+                f"page={page}",
+                f"offset={offset}",
+                "sort=asc",
+            ]
+        )
+        url = f"{self._base_url}&{query_args}"
+
+        response: Dict[str, Any] = self.query(url)
+        result: List[InternalTransaction] = [InternalTransaction(t) for t in response["result"]]
         return result
 
     def get_tokentx(
