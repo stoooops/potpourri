@@ -34,4 +34,4 @@ class ERC20Transfer(BaseEventDetailed):
 
     @property
     def value_decimal(self) -> Decimal:
-        return self._value / 10 ** self._token_decimal
+        return Decimal(self._value) / Decimal(10 ** self._token_decimal)
