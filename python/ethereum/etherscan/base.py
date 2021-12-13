@@ -25,7 +25,7 @@ class BaseEvent:
             self._to_address: str = data["to"]
 
         except Exception:
-            print(f"Could not parse: {data}")
+            # no logging this deep in the library?
             raise
 
     @property
@@ -86,7 +86,7 @@ class BaseEventDetailed(BaseEvent):
             self._transaction_index: int = int(data["transactionIndex"])
 
         except Exception:
-            print(f"Could not parse: {data}")
+            # no logging this deep in the library?
             raise
 
     @property

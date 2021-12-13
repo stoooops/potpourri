@@ -15,7 +15,7 @@ class Transaction(BaseEventDetailed):
             )
             self._value: int = int(data["value"])  # wei
         except Exception:
-            print(f"Could not parse: {data}")
+            # no logging this deep in the library?
             raise
 
     @property
@@ -59,7 +59,7 @@ class InternalTransaction(BaseEvent):
             self._is_error: int = int(data["isError"])
             self._value: int = int(data["value"])  # wei
         except Exception:
-            print(f"Could not parse: {data}")
+            # no logging this deep in the library?
             raise
 
     @property
