@@ -1,10 +1,13 @@
 import json
+import time
 from logging import getLogger
 from typing import Optional
 
 import tweepy
 
 LOG = getLogger(__name__)
+
+MAX_RETRIES = 3
 
 
 class TwitterClient:
@@ -30,11 +33,23 @@ class TwitterClient:
         except Exception:
             LOG.error("Error during authentication")
 
-    def tweet(self, s: str, media_filepath: Optional[str] = None) -> None:
-        if media_filepath is None:
-            self._api.update_status(s)
-        else:
-            self._api.update_with_media(media_filepath, s)
+    def tweet(self, s: str, media_filepath: Optional[str] = None) -> bool:
+        attempt = 0
+        while attempt < MAX_RETRIES:
+            try:
+                if media_filepath is None:
+                    self._api.update_status(s)
+                else:
+                    self._api.update_with_media(media_filepath, s)
+
+                return True
+            except tweepy.error.TweepError as e:
+                LOG.error("Tweet failed.")
+                LOG.exception(e)
+            attempt += 1
+            time.sleep(attempt ** 2)
+
+        return False
 
     def delete_all(self) -> None:
         for status in tweepy.Cursor(self._api.user_timeline).items():
