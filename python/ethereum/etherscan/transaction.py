@@ -32,11 +32,11 @@ class Transaction(BaseEventDetailed):
 
     @property
     def fee_gwei(self) -> Decimal:
-        return Decimal(self._gas_used * self._gas_price) / 10**9
+        return Decimal(self._gas_used * self._gas_price) / 10 ** 9
 
     @property
     def fee_eth(self) -> Decimal:
-        return Decimal(self._gas_used * self._gas_price) / 10**18
+        return Decimal(self._gas_used * self._gas_price) / 10 ** 18
 
     @property
     def value_wei(self) -> int:
@@ -44,11 +44,11 @@ class Transaction(BaseEventDetailed):
 
     @property
     def value_gwei(self) -> Decimal:
-        return Decimal(self._value) / Decimal(10**9)
+        return Decimal(self._value) / Decimal(10 ** 9)
 
     @property
     def value_eth(self) -> Decimal:
-        return Decimal(self._value) / Decimal(10**18)
+        return Decimal(self._value) / Decimal(10 ** 18)
 
 
 class InternalTransaction(BaseEvent):
@@ -72,8 +72,8 @@ class InternalTransaction(BaseEvent):
 
     @property
     def value_gwei(self) -> Decimal:
-        return Decimal(self._value) / Decimal(10**9)
+        return Decimal(self._value) / Decimal(10 ** 9)
 
     @property
     def value_eth(self) -> Decimal:
-        return Decimal(self._value) / Decimal(10**18)
+        return Decimal(self._value) / Decimal(10 ** 18)
