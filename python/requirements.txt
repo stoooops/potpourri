@@ -1,2 +1,4 @@
+black
+isort
+requests
 tweepy==3.10.0
-

@@ -47,7 +47,7 @@ class TwitterClient:
                 LOG.error("Tweet failed.")
                 LOG.exception(e)
             attempt += 1
-            time.sleep(attempt ** 2)
+            time.sleep(attempt**2)
 
         return False
 

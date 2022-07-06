@@ -3,7 +3,6 @@ from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
 import requests
-
 from potpourri.python.ethereum.etherscan.erc20 import ERC20Transfer
 from potpourri.python.ethereum.etherscan.erc721 import ERC721Transfer
 from potpourri.python.ethereum.etherscan.transaction import InternalTransaction, Transaction

@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-from argparse import ArgumentParser, Namespace
 import os
-import requests
 import time
+from argparse import ArgumentParser, Namespace
+
+import requests
 
 
 class IfThisThenThatClient:

@@ -64,7 +64,7 @@ class BaseBlock:
 
     @property
     def base_issuance_eth(self) -> int:
-        return Decimal(self.base_issuance) / Decimal(10 ** 18)
+        return Decimal(self.base_issuance) / Decimal(10**18)
 
     @property
     def json(self) -> Dict[str, Any]:
@@ -73,7 +73,7 @@ class BaseBlock:
     @property
     def burned_eth(self) -> Decimal:
         burnt_wei = Decimal(self._gas_used) * Decimal(self._base_fee_per_gas)
-        burnt_eth = burnt_wei / Decimal(10 ** 18)
+        burnt_eth = burnt_wei / Decimal(10**18)
         return burnt_eth
 
     @property
