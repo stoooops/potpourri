@@ -46,6 +46,9 @@ class TwitterClient:
             except tweepy.error.TweepError as e:
                 LOG.error("Tweet failed.")
                 LOG.exception(e)
+            except Exception as e:
+                LOG.error("Tweet failed.")
+                LOG.exception(e)
             attempt += 1
             time.sleep(attempt**2)
 
