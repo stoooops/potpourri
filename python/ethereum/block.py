@@ -63,6 +63,14 @@ class BaseBlock:
         return get_base_reward(self._number)
 
     @property
+    def base_fee_per_gas(self) -> int:
+        return self._base_fee_per_gas
+
+    @property
+    def gas_used(self) -> int:
+        return self._gas_used
+
+    @property
     def base_issuance_eth(self) -> int:
         return Decimal(self.base_issuance) / Decimal(10**18)
 
