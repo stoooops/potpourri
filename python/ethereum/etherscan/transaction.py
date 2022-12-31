@@ -58,6 +58,7 @@ class InternalTransaction(BaseEvent):
         try:
             self._is_error: int = int(data["isError"])
             self._value: int = int(data["value"])  # wei
+            self._trace_id: str = data["traceId"]
         except Exception:
             # no logging this deep in the library?
             raise
@@ -65,6 +66,10 @@ class InternalTransaction(BaseEvent):
     @property
     def is_error(self) -> int:
         return self._is_error
+
+    @property
+    def trace_id(self) -> str:
+        return self._trace_id
 
     @property
     def value_wei(self) -> int:
