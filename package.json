@@ -1,0 +1,8 @@
+{
+  "name": "potpourri",
+  "version": "1.0.0",
+  "description": "A mixture of programming petals and spices placed in a repository to perfume a project",
+  "repository": "git@github.com:stoooops/potpourri.git",
+  "author": "Cory Gabrielsen",
+  "license": "MIT"
+}
