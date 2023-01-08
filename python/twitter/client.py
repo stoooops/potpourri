@@ -33,6 +33,10 @@ class TwitterClient:
         except Exception:
             LOG.error("Error during authentication")
 
+    @property
+    def api(self) -> tweepy.API:
+        return self._api
+
     def tweet(self, s: str, media_filepath: Optional[str] = None) -> bool:
         attempt = 0
         while attempt < MAX_RETRIES:
@@ -58,6 +62,9 @@ class TwitterClient:
         for status in tweepy.Cursor(self._api.user_timeline).items():
             self._api.destroy_status(status.id)
             LOG.info(f"Deleted tweet {status.id}")
+
+    def get_status(self, tweet_id: str) -> tweepy.Status:
+        return self._api.get_status(tweet_id)
 
 
 def make_twitter_client(secrets_json_filepath: str) -> TwitterClient:
