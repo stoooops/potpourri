@@ -8,7 +8,9 @@ import time
 from typing import Any, Dict, List, Optional, Union
 
 from potpourri.python.openai.commit_message import CommitMessage
-from potpourri.python.openai.completion import Completion, CompletionRequest, CompletionResponse
+from potpourri.python.openai.completion import (Completion, CompletionRequest,
+                                                CompletionResponse)
+from potpourri.python.openai.parse.completion_parser import CompletionParser
 
 
 class OpenAIApiException(Exception):
@@ -108,78 +110,6 @@ class OpenAIApiClient:
             return False
         return True
 
-    def parse_commit_message(self, completion: Completion) -> CommitMessage:
-        # Initialize variables to store the three sections
-        description = ""
-        subject_lines = []
-        commit_message = ""
-
-        # Iterate through the lines and extract the three sections
-        section = None
-        for line in completion.text_lines():
-            if line.startswith("Subject lines:"):
-                section = "subject_lines"
-            elif line.startswith("Suggested commit message:"):
-                section = "commit_message"
-            elif line.startswith("- ") and section == "subject_lines":
-                subject_lines.append(line[2:])
-            elif section == "commit_message":
-                # ```text
-                # foo
-                # ```
-                if line.startswith("```"):
-                    continue
-                # Wrap the line at 72 characters
-                for wrapped in self.wrap_text(line, 72):
-                    commit_message += wrapped + "\n"
-            else:
-                description += line + "\n"
-
-        # Strip leading/trailing white space and remove the "(commit message written by OpenAI text-davinci-003)" line
-        description = description.strip()
-        commit_message = commit_message.strip()
-        commit_message = re.sub(r"\(commit message written by OpenAI text-davinci-003\)", "", commit_message)
-
-        # Return an instance of the CommitMessage class
-        return CommitMessage(description, subject_lines, commit_message)
-
-    def wrap_text(self, lines: Union[str, List[str]], wrap_length: int) -> List[str]:
-        """
-        Wraps a list of strings at a specified wrap length, splitting only on spaces.
-
-        Parameters:
-        lines (str or list of str): The list of strings to wrap.
-        wrap_length (int): The maximum length for each wrapped string.
-
-        Returns:
-        list of str: A list of the wrapped strings.
-        """
-        if isinstance(lines, str):
-            lines = [lines]
-
-        # Initialize a list to store the wrapped lines
-        wrapped_lines = []
-
-        # Iterate through each line in the list
-        for line in lines:
-            # Keep wrapping the line until it is shorter than the wrap length
-            while len(line) > wrap_length:
-                # Try to find the last space in the line that occurs before the wrap length
-                space_index = line.rfind(" ", 0, wrap_length + 1)
-
-                # If no space is found, just wrap the line at the wrap length
-                if space_index == -1:
-                    space_index = wrap_length
-
-                # Add the wrapped line to the list
-                wrapped_lines.append(line[:space_index])
-
-                # Update the line to be the remaining portion after the wrapped line
-                line = line[space_index:]
-                # Add the final wrapped line to the list
-                wrapped_lines.append(line)
-        return wrapped_lines
-
     def get_suggested_commit_message(
         self,
         prompt: str,
@@ -221,7 +151,8 @@ class OpenAIApiClient:
                 with open(".prompt", "a") as f:
                     f.write(completion.text)
 
-                commit_message: CommitMessage = self.parse_commit_message(completion)
+                completion_parser = CompletionParser()
+                commit_message: CommitMessage = completion_parser.parse_commit_message(completion)
 
                 return commit_message
             except socket.timeout as e:
