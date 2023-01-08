@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
 
 class Completion:
@@ -31,13 +31,13 @@ class CompletionRequest:
         self.max_tokens = max_tokens
         self.temperature = temperature
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> Dict[str, Union[float, int, str]]:
         """Convert the completion request to a dictionary."""
         return {
             "prompt": self.prompt,
             "model": self.model,
-            "max_tokens": str(self.max_tokens),
-            "temperature": str(self.temperature),
+            "max_tokens": self.max_tokens,
+            "temperature": self.temperature,
         }
 
 
