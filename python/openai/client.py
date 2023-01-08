@@ -1,7 +1,11 @@
+import http.client
+import json
+import os
+import re
 import socket
 import sys
 import time
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from potpourri.python.openai.commit_message import CommitMessage
 from potpourri.python.openai.completion import Completion, CompletionRequest, CompletionResponse
@@ -61,10 +65,10 @@ class OpenAIApiClient:
         data: bytes = json.dumps(request.to_dict()).encode("utf-8")
         self.conn.request("POST", self.route_completion, body=data, headers=headers)
         response: http.client.HTTPResponse = self.conn.getresponse()
-        response_data = response.read()
+        response_bytes: bytes = response.read()
         try:
             # {'id': 'cmpl-6ViayJ6ZhIl5HmAOpiA23oX4naca9', 'object': 'text_completion', 'created': 1673017612, 'model': 'text-davinci-003', 'choices': [{'text': 'response', 'index': 0, 'logprobs': None, 'finish_reason': 'length'}], 'usage': {'prompt_tokens': 3759, 'completion_tokens': 300, 'total_tokens': 4059}}
-            response_data = json.loads(response_data)
+            response_data: Dict[str, Any] = json.loads(response_bytes)
             # {'error': {'message': 'That model is currently overloaded with other requests. You can retry your request, or contact us through our help center at help.openai.com if the error persists. (Please include the request ID 44fa8f95f731a58124b775d316c1b044 in your message.)', 'type': 'server_error', 'param': None, 'code': None}}
             if "error" in response_data:
                 print(
