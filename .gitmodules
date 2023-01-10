@@ -1,0 +1,3 @@
+[submodule "web/eth-dust-collector"]
+	path = web/eth-dust-collector
+	url = git@github.com:stoooops/eth-dust-collector.git
